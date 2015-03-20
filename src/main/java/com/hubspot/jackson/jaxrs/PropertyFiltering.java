@@ -8,6 +8,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PropertyFiltering {
-  String using() default "property";
-  String[] always() default {};
+    String using() default "property";
+    String[] always() default {};
 }
