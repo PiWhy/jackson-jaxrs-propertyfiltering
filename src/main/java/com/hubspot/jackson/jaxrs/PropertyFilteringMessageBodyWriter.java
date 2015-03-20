@@ -54,9 +54,21 @@ public class PropertyFilteringMessageBodyWriter implements MessageBodyWriter<Obj
         PropertyFiltering annotation = findPropertyFiltering(annotations);
 
         Collection<String> properties = getProperties(annotation.using());
-        properties.addAll(Arrays.asList(annotation.always()));
+        Collection<String> finalProperties = new ArrayList<String>();
 
-        PropertyFilter propertyFilter = new PropertyFilter(properties);
+        String prefix = annotation.prefix();
+
+        if(!prefix.isEmpty()) {
+            for(String property : properties)
+                finalProperties.add(prefix + "." + property);
+
+        } else {
+            finalProperties.addAll(properties);
+        }
+
+        finalProperties.addAll(Arrays.asList(annotation.always()));
+
+        PropertyFilter propertyFilter = new PropertyFilter(finalProperties);
         if (!propertyFilter.hasFilters()) {
             write(o, type, genericType, annotations, mediaType, httpHeaders, os);
             return;
