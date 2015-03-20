@@ -8,9 +8,12 @@ import java.util.*;
 import java.util.Map.Entry;
 
 public class PropertyFilter {
-    private final NestedPropertyFilter filter = new NestedPropertyFilter();
+    private final NestedPropertyFilter filter;
 
-    public PropertyFilter(Collection<String> properties) {
+    public PropertyFilter(Collection<String> properties, Collection<String> expandedProperties) {
+
+        filter = new NestedPropertyFilter(expandedProperties);
+
         for (String property : properties) {
             if (!property.isEmpty()) {
                 filter.addProperty(property);
@@ -30,6 +33,12 @@ public class PropertyFilter {
         private final Set<String> includedProperties = new HashSet<String>();
         private final Set<String> excludedProperties = new HashSet<String>();
         private final Map<String, NestedPropertyFilter> nestedProperties = new HashMap<String, NestedPropertyFilter>();
+        private final Set<String> expandedProperties = new HashSet<String>();
+
+        public NestedPropertyFilter(Collection<String> expandedProperties) {
+            for(String expandedProperty : expandedProperties)
+                this.expandedProperties.add(expandedProperty);
+        }
 
         public void addProperty(String property) {
             boolean excluded = property.startsWith("!");
@@ -43,7 +52,7 @@ public class PropertyFilter {
 
                 NestedPropertyFilter nestedFilter = nestedProperties.get(prefix);
                 if (nestedFilter == null) {
-                    nestedFilter = new NestedPropertyFilter();
+                    nestedFilter = new NestedPropertyFilter(new ArrayList<String>());
                     nestedProperties.put(prefix, nestedFilter);
                 }
 
@@ -84,6 +93,13 @@ public class PropertyFilter {
             }
 
             object.remove(excludedProperties);
+
+            for(String name : expandedProperties) {
+                JsonNode node = object.get(name);
+
+                if(node != null)
+                    nestedProperties.remove(name);
+            }
 
             for (Entry<String, NestedPropertyFilter> entry : nestedProperties.entrySet()) {
                 JsonNode node = object.get(entry.getKey());

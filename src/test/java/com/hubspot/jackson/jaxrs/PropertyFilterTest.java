@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -63,7 +64,7 @@ public class PropertyFilterTest {
     private static JsonNode filter(String... properties) {
         JsonNode node = node();
 
-        new PropertyFilter(Arrays.asList(properties)).filter(node);
+        new PropertyFilter(Arrays.asList(properties), new ArrayList<String>()).filter(node);
         return node;
     }
 
